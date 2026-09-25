@@ -58,7 +58,7 @@ export default function PostsPage() {
         setPosts((prev) =>
             prev.map((p) => (p.id === postId ? { ...p, caption: updatedPost.caption || newCaption, updated_at: updatedPost.updated_at } : p))
         );
-        showToast(`💾 Caption for post #${postId} updated via PATCH /users/posts/${postId}/!`);
+        showToast(`💾 Caption for post #${postId} updated via PATCH!`);
     };
 
     /**
@@ -67,16 +67,16 @@ export default function PostsPage() {
     const handleDeletePost = async (postId) => {
         const msg = await deletePost(token, postId);
         setPosts((prev) => prev.filter((p) => p.id !== postId));
-        showToast(`🗑️ ${msg} (DELETE /users/posts/${postId}/)`);
+        showToast(`🗑️ ${msg}`);
     };
 
     /**
-     * Create post via POST /users/posts/
+     * Create post via POST /users/posts/ with binary FormData
      */
-    const handleCreatePost = async (imageUrl, caption) => {
-        const newPost = await createPost(token, imageUrl, caption);
+    const handleCreatePost = async (imageFile, caption) => {
+        const newPost = await createPost(token, imageFile, caption);
         setPosts((prev) => [newPost, ...prev]);
-        showToast(`🚀 Post #${newPost.id} published via POST /users/posts/!`);
+        showToast(`🚀 Post #${newPost.id} uploaded successfully via form-data!`);
     };
 
     if (!token) return null;
@@ -97,7 +97,7 @@ export default function PostsPage() {
                     <div>
                         <h2 className="text-2xl font-bold text-white tracking-tight">Your Posts</h2>
                         <p className="text-xs text-slate-400 mt-0.5">
-                            Connected to <code className="text-pink-400 font-mono">/users/posts/</code> with caption editing (PATCH) and delete options
+                            Connected to <code className="text-pink-400 font-mono">/users/posts/</code> with binary file upload, caption editing (PATCH) and delete
                         </p>
                     </div>
                     <div className="flex items-center gap-2.5">
@@ -157,7 +157,7 @@ export default function PostsPage() {
                         </div>
                     ) : posts.length === 0 ? (
                         <div className="text-center py-20 text-slate-500 text-sm">
-                            No posts found. Click "+ Create Post" to add one!
+                            No posts found. Click "+ Create Post" to upload one!
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

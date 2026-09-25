@@ -79,26 +79,40 @@ export async function fetchPosts(token) {
 }
 
 /**
- * 5. POST /users/posts/
+ * 5. POST /users/posts/ (Multipart FormData with Binary File Upload)
+ * Headers: Authorization: Token <token_key>
+ * Body: FormData with fields:
+ *   - caption: "First Post" (Text)
+ *   - image: <binary File> (File)
  */
-export async function createPost(token, imageUrl, caption) {
+export async function createPost(token, imageFile, caption) {
+    const formData = new FormData();
+    formData.append('caption', caption);
+    if (imageFile) {
+        formData.append('image', imageFile);
+    }
+
+    const headers = {};
+    if (token) {
+        headers['Authorization'] = `Token ${token}`;
+    }
+    // Note: Do NOT set Content-Type header so the browser sets multipart/form-data with boundary
+
     const response = await fetch(`${BASE_URL}/users/posts/`, {
         method: 'POST',
-        headers: getAuthHeaders(token),
-        body: JSON.stringify({ caption, image: imageUrl })
+        headers: headers,
+        body: formData
     });
     const data = await response.json();
     if (!response.ok) {
-        throw new Error(data.detail || data.error || 'Failed to create post.');
+        const errMsg = data.detail || data.error || data.image?.[0] || data.caption?.[0] || 'Failed to create post.';
+        throw new Error(errMsg);
     }
     return data;
 }
 
 /**
  * 6. PATCH /users/posts/<id>/
- * Request Header: Authorization: Token <token_key>
- * Request Body: { "caption": "Panther Spotted!!!" }
- * Response: { "id": 7, "user": 3, "username": "testuser", "caption": "Panther Spotted!!!", "image": "...", ... }
  */
 export async function updatePostCaption(token, postId, newCaption) {
     const response = await fetch(`${BASE_URL}/users/posts/${postId}/`, {
@@ -115,8 +129,6 @@ export async function updatePostCaption(token, postId, newCaption) {
 
 /**
  * 7. DELETE /users/posts/<id>/
- * Request Header: Authorization: Token <token_key>
- * Response: { "detail": "Post deleted successfully." }
  */
 export async function deletePost(token, postId) {
     const response = await fetch(`${BASE_URL}/users/posts/${postId}/`, {

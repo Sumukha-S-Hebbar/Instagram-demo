@@ -2,7 +2,6 @@
 
 **Base URL**: `http://localhost:8000`  
 **Authentication Header**: `Authorization: Token <token_key>` *(e.g. `Authorization: Token 38df5c02b324e5e8f1379e1ab287cca69a562b02`)*  
-**Content-Type**: `application/json`
 
 ---
 
@@ -100,16 +99,13 @@
 
 ---
 
-### 3.2 Create Post
+### 3.2 Create Post (Binary File Upload)
 * **Route**: `POST http://localhost:8000/users/posts/`
 * **Headers**: `Authorization: Token <token_key>`
-* **Request Body**:
-  ```json
-  {
-    "caption": "First Post",
-    "image": "http://localhost:8000/media/posts/Panther.jpg"
-  }
-  ```
+* **Content-Type**: `multipart/form-data`
+* **Request Body (FormData)**:
+  - `caption`: `First Post` (Text)
+  - `image`: `<binary File (e.g. Panther.jpg)>` (File)
 * **Success Response (`201 Created` / `200 OK`)**:
   ```json
   {
@@ -131,12 +127,7 @@
 
 ### 3.3 Update Post Caption
 * **Route**: `PATCH http://localhost:8000/users/posts/{id}/`
-* **Headers**:
-  ```http
-  Authorization: Token <token_key>
-  Content-Type: application/json
-  Accept: application/json
-  ```
+* **Headers**: `Authorization: Token <token_key>`, `Content-Type: application/json`
 * **Request Body**:
   ```json
   {
